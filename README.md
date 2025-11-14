@@ -8,6 +8,15 @@ This setup is commonly used by data engineering teams to process Snowflake data 
 
 ---
 
+## 🏗️ Architecture
+
+![Snowflake Glue Architecture](glue job to snowflake.png)
+
+**Flow Overview:**  
+AWS Glue (PySpark) → Snowflake (via Spark Connector + JDBC) → Transform → Write Back
+
+---
+
 ## 🚀 What This Pipeline Does (Simple Explanation)
 
 1. AWS Glue job runs a **PySpark script**  
@@ -28,10 +37,11 @@ This enables scalable Snowflake analytics using Spark clusters.
 
 Snowflake-Data-Spark-Integration/
 │
-├── gluejobforsnowflake.py                 # Main PySpark ETL script for Glue
-├── snowflake-jdbc-3.13.15.jar             # JDBC connector for Snowflake
+├── gluejobforsnowflake.py                  # Main PySpark ETL script for Glue
+├── snowflake-jdbc-3.13.15.jar              # JDBC connector for Snowflake
 ├── spark-snowflake_2.12-2.9.2-spark_3.1.jar # Spark-Snowflake connector
-├── read me..txt                           # Notes / reference
+├── glue job to snowflake.png               # Architecture Diagram
+├── read me..txt                            # Notes / reference
 └── README.md
 
 ````
@@ -41,22 +51,19 @@ Snowflake-Data-Spark-Integration/
 ## 🔧 Components Used
 
 ### **1️⃣ Snowflake JDBC Connector**
-- File: `snowflake-jdbc-3.13.15.jar`
-- Purpose:  
-  Enables low-level JDBC connectivity between Spark and Snowflake.
+- File: `snowflake-jdbc-3.13.15.jar`  
+- Purpose: Enables low-level JDBC connectivity between Spark and Snowflake.
 
 ### **2️⃣ Snowflake Spark Connector**
-- File: `spark-snowflake_2.12-2.9.2-spark_3.1.jar`
-- Purpose:  
-  Allows Spark to read/write Snowflake tables using Spark DataFrames efficiently.
+- File: `spark-snowflake_2.12-2.9.2-spark_3.1.jar`  
+- Purpose: Allows Spark to read/write Snowflake tables using Spark DataFrames efficiently.
 
 ### **3️⃣ PySpark Script (AWS Glue Job)**
-- File: `gluejobforsnowflake.py`
-- Purpose:  
-  Executes Spark job that interacts with Snowflake:
-  - Reads tables  
-  - Runs SQL  
-  - Writes results back  
+- File: `gluejobforsnowflake.py`  
+- Purpose: Executes Spark job to:
+  - Read tables  
+  - Run SQL  
+  - Write processed output back to Snowflake  
 
 ---
 
@@ -65,28 +72,26 @@ Snowflake-Data-Spark-Integration/
 ### **Step 1 — Initialize Spark Session**
 AWS Glue starts a distributed PySpark session.
 
-### **Step 2 — Load Snowflake Options**
+### **Step 2 — Load Snowflake Connection Options**
 Includes:
 - URL  
-- User  
+- Username  
 - Password  
 - Database  
 - Schema  
 - Warehouse  
 
 ### **Step 3 — Read Data from Snowflake**
-Using:
+
 ```python
 df = spark.read.format("net.snowflake.spark.snowflake")
 ````
 
-### **Step 4 — Run Transformations or SQL**
+### **Step 4 — Transformations / SQL Queries**
 
-Spark runs your logic, filters, transformations, aggregations, or SQL queries.
+Spark executes aggregations, filtering, joins, and SQL operations.
 
 ### **Step 5 — Write Back to Snowflake**
-
-Example:
 
 ```python
 df.write.mode("overwrite").format("snowflake")
@@ -143,25 +148,23 @@ spark.stop()
 
 ### **1️⃣ Upload Connectors**
 
-Upload the following to S3 and attach to Glue job:
+Upload to S3 and attach to Glue job:
 
 * `snowflake-jdbc-3.13.15.jar`
 * `spark-snowflake_2.12-2.9.2-spark_3.1.jar`
 
-Glue → Job → “Job Parameters / Libraries”
-
 ### **2️⃣ Create AWS Glue Job**
 
+Configure:
+
+* Script: `gluejobforsnowflake.py`
+* Worker type: Standard / G.1X
+* Glue version: Spark 3.x
+* IAM role: S3 + Snowflake permissions
+
+### **3️⃣ Update Script with Snowflake Credentials**
+
 Set:
-
-* Script location: `gluejobforsnowflake.py`
-* Worker type: Standard or G.1X
-* Glue version: Spark 3.x compatible
-* IAM Role: S3 + Snowflake permission
-
-### **3️⃣ Configure Snowflake Connection Inside Script**
-
-Fill:
 
 * URL
 * USER
@@ -170,64 +173,49 @@ Fill:
 * SCHEMA
 * WAREHOUSE
 
-### **4️⃣ Run the Glue Job**
+### **4️⃣ Run the Job**
 
 It will:
 
 * Connect to Snowflake
-* Read from the table
-* Execute transformations
-* Write results back
+* Read table
+* Process data
+* Save results back
 
 ---
 
 # 🧪 Testing & Validation
 
-### ✔ Confirm JDBC & Spark connectors load
+### ✔ Check connector loading in Glue logs
 
-Check Glue job logs for connector load success.
-
-### ✔ Validate Snowflake read
-
-Run:
+### ✔ Run Snowflake read query
 
 ```sql
 SELECT * FROM MY_TABLE;
 ```
 
-### ✔ Validate outputs
+### ✔ Verify processed output table
 
-Check new table or updated rows in Snowflake.
-
-### ✔ Review Glue logs
-
-Look for:
-
-* Connection success
-* DataFrame load
-* Write confirmation
+### ✔ Review Glue logs for ETL success/failure
 
 ---
 
 # 🎯 Skills Demonstrated
 
-* Spark + Snowflake integration
-* Distributed ETL processing
-* Using JDBC & Spark connectors
-* AWS Glue PySpark development
-* External database connectivity
-* Data ingestion + writeback patterns
-* Cloud-based analytics integration
-
-This level of hands-on work represents typical tasks for real-world ETL engineers.
+* Snowflake + Spark integration
+* Distributed ETL using AWS Glue
+* Connector-based data ingestion
+* Secure external database access
+* Writing DataFrames back to Snowflake
+* Cloud-based data engineering patterns
 
 ---
 
 # 📄 Resume Bullet Points
 
-* Developed ETL pipeline using **AWS Glue PySpark** to integrate with **Snowflake**, leveraging JDBC and Spark-Snowflake connectors for high-performance data transfer.
-* Designed and executed distributed queries, table writes, and analytics workflows directly from Spark to Snowflake.
-* Implemented secure Snowflake connectivity using Glue job parameters, external connectors, and optimized Spark session configuration.
+* Built an ETL pipeline using **AWS Glue PySpark** to read and write Snowflake datasets using JDBC and Spark-Snowflake connectors.
+* Executed distributed SQL and DataFrame transformations at scale.
+* Implemented secure connection handling and optimized Spark configuration for Snowflake workloads.
 
 ---
 
@@ -242,4 +230,5 @@ GitHub: [gnanaprakashn](https://github.com/gnanaprakashn)
 # 📜 License
 
 MIT © 2025
+
 
