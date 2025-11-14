@@ -10,7 +10,9 @@ This setup is commonly used by data engineering teams to process Snowflake data 
 
 ## 🏗️ Architecture
 
+
 ![Snowflake Glue Architecture](glue job to snowflake.png)
+<img src="glue job to snowflake.png" width="850"/>
 
 **Flow Overview:**  
 AWS Glue (PySpark) → Snowflake (via Spark Connector + JDBC) → Transform → Write Back
