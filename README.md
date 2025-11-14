@@ -234,7 +234,7 @@ This level of hands-on work represents typical tasks for real-world ETL engineer
 # 👤 Author
 
 **Gnana Prakash N**
-Aspiring Data Engineer
+Data Engineer
 GitHub: [gnanaprakashn](https://github.com/gnanaprakashn)
 
 ---
